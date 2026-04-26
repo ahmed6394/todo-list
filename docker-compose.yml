@@ -1,0 +1,20 @@
+services:
+  todo-dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm start -- --host 0.0.0.0 --poll 2000
+
+  todo-prod:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "8080:80"
+    profiles:
+      - prod

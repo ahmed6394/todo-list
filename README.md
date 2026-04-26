@@ -6,6 +6,30 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Docker
+
+### Run in development mode (hot reload)
+
+```bash
+docker compose up --build todo-dev
+```
+
+Open `http://localhost:4200`.
+
+### Run in production mode (Nginx)
+
+```bash
+docker compose --profile prod up --build todo-prod
+```
+
+Open `http://localhost:8080`.
+
+### Stop containers
+
+```bash
+docker compose down
+```
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
