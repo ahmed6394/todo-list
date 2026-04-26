@@ -54,7 +54,12 @@ jobs:
 
             if ! command -v docker >/dev/null 2>&1; then
               sudo apt-get update
-              sudo apt-get install -y docker.io
+              # Prefer Docker CE on hosts that already have containerd.io from Docker repo.
+              if dpkg -s containerd.io >/dev/null 2>&1; then
+                sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli
+              else
+                sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io
+              fi
               sudo systemctl enable docker
               sudo systemctl start docker
             fi
