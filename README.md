@@ -44,6 +44,59 @@ docker build -t ahmed63/todo-list:v1 --target prod .
 docker push ahmed63/todo-list:v1
 ```
 
+## CI/CD (GitHub Actions)
+
+Workflow file: `.github/workflows/main.yaml`
+
+The pipeline runs on push to `main` (and can also be triggered manually).
+
+### What the pipeline does
+
+1. Builds the Docker image using the `prod` stage.
+2. Pushes tags `v1` and `latest` to Docker Hub.
+3. SSHes into an EC2 instance.
+4. Pulls `ahmed63/todo-list:v1` on EC2.
+5. Replaces the running `todo-list` container on port `80`.
+
+### Required GitHub repository secrets
+
+Add these in GitHub repository settings:
+
+- `DOCKER_USERNAME` - Docker Hub username (example: `ahmed63`)
+- `DOCKER_PASSWORD` - Docker Hub password or access token
+- `AWS_HOST` - EC2 public IP or DNS where container is deployed
+- `AWS_USER` - SSH user for that EC2 instance (example: `ubuntu`)
+- `AWS_KEY` - Full private key content (`.pem`) for EC2 SSH access
+
+Path in GitHub UI:
+
+`Repository -> Settings -> Secrets and variables -> Actions -> New repository secret`
+
+### Trigger and monitor pipeline
+
+1. Commit and push changes to `main`.
+2. Open the Actions tab in GitHub.
+3. Open the latest run of `CI/CD for todo-list App`.
+4. Check `build-and-push` and `deploy` job logs.
+
+### Verify deployment on EC2
+
+```bash
+docker ps
+docker logs todo-list
+curl http://localhost
+```
+
+### Common CI/CD issues
+
+- `denied: requested access to the resource is denied`
+	- Check `DOCKER_USERNAME` and `DOCKER_PASSWORD` secrets.
+- `Permission denied (publickey)`
+	- Check `AWS_USER`, `AWS_HOST`, and `AWS_KEY` secrets.
+- Image not updated on EC2
+	- Confirm workflow pushed `v1` successfully.
+	- Confirm deploy job pulled `todo-list:v1` and restarted container.
+
 ## Deploy to Kubernetes
 
 ```bash
