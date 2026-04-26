@@ -1,0 +1,66 @@
+name: CI/CD for todo-list App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: todo-list
+  IMAGE_TAG: v1
+  CONTAINER_NAME: todo-list
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push image tags
+
+        run: |
+          docker build --target prod \
+            -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
+            .
+
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Deploy to AWS EC2
+        run: |
+          echo "${{ secrets.AWS_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << EOF
+            set -e
+
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+            docker stop ${{ env.CONTAINER_NAME }} || true
+            docker rm ${{ env.CONTAINER_NAME }} || true
+
+            docker run -d \
+              --name ${{ env.CONTAINER_NAME }} \
+              --restart unless-stopped \
+              -p 80:80 \
+              ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          EOF
