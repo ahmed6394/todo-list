@@ -8,6 +8,25 @@
 /frontend/npm-debug.log
 /frontend/yarn-error.log
 
+# Backend - Compiled output
+/backend/dist
+/backend/tmp
+# Python-generated files
+__pycache__/
+/backend/*.py[oc]
+/backend/build/
+/backend/dist/
+/backend/wheels/
+/backend/*.egg-info
+/backend/.python-version
+/backend/uv.log
+# Virtual environments
+/backend/.venv
+
+/backend/.env
+/backend/test.db
+
+
 # IDEs and editors
 .idea/
 .project
