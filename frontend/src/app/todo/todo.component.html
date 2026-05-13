@@ -31,16 +31,16 @@
             class="align-middle rounded"
           >
             <td scope="row" class="p-3">{{ i + 1 }}</td>
-            <td class="{{ !todo.isCompleted ? 'done' : 'todoList' }}">
-              {{ todo.name }}
+            <td class="{{ todo.status ? 'done' : 'todoList' }}">
+              {{ todo.content }}
             </td>
-            <td (click)="done(i)" class="todoList">
+            <td (click)="done(todo)" class="todoList">
               <i
                 class="bi bi-check justify-center"
                 style="font-size: 1.7rem; color: cornflowerblue"
               ></i>
             </td>
-            <td (click)="remove(i)" class="todoList">
+            <td (click)="remove(todo)" class="todoList">
               <i class="bi bi-trash" style="font-size: 1.1rem; color: red"></i>
             </td>
           </tr>

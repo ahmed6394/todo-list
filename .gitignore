@@ -1,15 +1,32 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# Frontend - Compiled output
+/frontend/dist
+/frontend/tmp
+/frontend/out-tsc
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# Frontend - Node
+/frontend/node_modules
+/frontend/npm-debug.log
+/frontend/yarn-error.log
 
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
+# Backend - Compiled output
+/backend/dist
+/backend/tmp
+# Python-generated files
+__pycache__/
+/backend/*.py[oc]
+/backend/build/
+/backend/dist/
+/backend/wheels/
+/backend/*.egg-info
+/backend/.python-version
+/backend/uv.log
+# Virtual environments
+/backend/.venv
+
+/backend/.env
+/backend/.env.local
+/backend/test.db
+
 
 # IDEs and editors
 .idea/
@@ -30,6 +47,7 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/frontend/.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
@@ -42,4 +60,6 @@ testem.log
 Thumbs.db
 
 
+# Environment & Secrets
 .env
+.env.local

@@ -5,6 +5,7 @@ Clean Angular 14 Todo app with local dev, Dockerized production, and Kubernetes 
 ## Quick start
 
 ```bash
+cd frontend
 npm install
 npm start
 ```
