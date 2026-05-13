@@ -24,6 +24,7 @@ __pycache__/
 /backend/.venv
 
 /backend/.env
+/backend/.env.local
 /backend/test.db
 
 
