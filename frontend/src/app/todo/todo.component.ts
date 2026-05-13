@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Todo } from '../Todo.model';
+import { TodoService } from '../services/todo.service';
 
 @Component({
   selector: 'app-todo',
@@ -8,35 +9,54 @@ import { Todo } from '../Todo.model';
 })
 export class TodoComponent implements OnInit {
   todos: Todo[] = [];
-  newTodo: string;
-  constructor() {}
+  newTodo: string = '';
+  constructor(private todoService: TodoService) {}
 
   ngOnInit(): void {
-    this.todos = JSON.parse(localStorage.getItem('list')!);
+    this.loadTodos();
+}
+
+loadTodos(): void {
+  this.todoService.getTodos().subscribe({
+  next: (data) => (this.todos = data),
+  error: (err) => console.error('Failed to load todos', err),
+  });
+}
+
+saveTodo(): void {
+  const content = (this.newTodo || '').trim();
+  if (!content) {
+    alert('Please enter todo');
+    return;
   }
 
-  saveTodo() {
-    if (this.newTodo) {
-      let todo = new Todo();
-      todo.name = this.newTodo;
-      todo.isCompleted = true;
-      this.todos = this.todos || [];
-      this.todos.push(todo);
-      localStorage.setItem('list', JSON.stringify(this.todos));
+  this.todoService.createTodo({ content, status: false }).subscribe({
+    next: () => {
       this.newTodo = '';
-    } else alert('Please enter todo');
+      this.loadTodos();
+    },
+    error: (err) => console.error('Failed to create todo', err),
+  });
+}
+
+done(todo: Todo): void {
+  this.todoService.updateTodo(todo.id, { status: !todo.status }).subscribe({
+  next: () => this.loadTodos(),
+  error: (err) => console.error('Failed to update todo', err),
+  });
+}
+
+  remove(todo: Todo): void {
+    this.todoService.deleteTodo(todo.id).subscribe({
+    next: () => this.loadTodos(),
+    error: (err) => console.error('Failed to delete todo', err),
+    });
   }
 
-  done(id: number) {
-    this.todos[id].isCompleted = !this.todos[id].isCompleted;
-  }
-
-  remove(id: number) {
-    this.todos = this.todos.filter((v, i) => i !== id);
-    localStorage.setItem('list', JSON.stringify(this.todos));
-  }
-  reset() {
-    localStorage.clear();
-    this.todos = [];
+  reset(): void {
+    this.todoService.deleteAllTodos().subscribe({
+    next: () => (this.todos = []),
+    error: (err) => console.error('Failed to reset todos', err),
+    });
   }
 }
